@@ -1,0 +1,445 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>无标题文档</title>
+    <!-- 新 Bootstrap5 核心 CSS 文件 -->
+    <link rel="stylesheet"
+        href="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/twitter-bootstrap/5.1.3/css/bootstrap.min.css">
+
+    <!--  popper.min.js 用于弹窗、提示、下拉菜单 -->
+    <script src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/popper.js/2.11.2/umd/popper.min.js"></script>
+
+    <!-- 最新的 Bootstrap5 核心 JavaScript 文件 -->
+    <script
+        src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/twitter-bootstrap/5.1.3/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            /* 移除默认边距，确保背景铺满整个页面 */
+            padding: 0;
+            /* 移除默认内边距 */
+            font-family: Arial, sans-serif;
+            /* 设置默认字体 */
+            color: white;
+            /* 设置文本颜色为白色，确保在深色背景上可见 */
+            position: relative;
+            /* 为伪元素设置相对定位参考 */
+            min-height: 100vh;
+            /* 确保body高度至少为视口高度 */
+        }
+
+        /* 使用CSS伪元素:before创建一个覆盖整个页面的背景层 */
+        body::before {
+            content: "";
+            /* 必须设置content属性，即使为空 */
+            position: fixed;
+            /* 固定定位，使背景不随页面滚动 */
+            top: 0;
+            left: 0;
+            /* 从页面左上角开始 */
+            width: 100%;
+            /* 宽度铺满整个页面 */
+            height: 100%;
+            /* 高度铺满整个页面 */
+            z-index: -1;
+            /* 将背景置于内容后面 */
+            /* 设置背景图片及其显示方式 */
+            background-image: url('img/海鸥.jpg');
+            /* 背景图片URL */
+            background-size: cover;
+            /* 自动缩放图片以覆盖整个背景区域 */
+            background-position: center;
+            /* 图片居中显示 */
+            background-repeat: no-repeat;
+            /* 不重复显示图片 */
+            /* 调整背景图片的透明度 */
+            opacity: 1;
+            /* 设置透明度为50%，可以在0.0-1.0之间调整 */
+        }
+
+        /* 页面内容容器 */
+        .content {
+            padding: 20px;
+            /* 添加内边距，使内容不紧贴屏幕边缘 */
+            max-width: 800px;
+            /* 限制最大宽度，提高可读性 */
+            margin: 0 auto;
+            /* 水平居中显示 */
+        }
+
+        /* 主要内容区域样式 */
+        .main-content {
+            background: rgba(0, 0, 0, 0.7);
+            /* 半透明黑色背景，增强文本可读性 */
+            padding: 20px;
+            /* 内边距 */
+            margin-top: 50px;
+            /* 顶部外边距 */
+            border-radius: 10px;
+            /* 圆角边框 */
+        }
+
+        .audio-player {
+            width: 100%;
+            max-width: 500px;
+            margin: 20px auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+
+        /* 音频信息区域 */
+        .audio-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        /* 专辑封面 */
+        .album-cover {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            background: url('https://p2.music.126.net/MIWMnBEedpJ8IpOau5D7PA==/109951168829804653.jpg?param=130y130') no-repeat center/cover;
+            margin-right: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 歌曲详情 */
+        .song-details {
+            flex: 1;
+        }
+
+        .song-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .song-artist {
+            font-size: 0.9rem;
+            color: #ddd;
+        }
+
+        /* 进度条容器 */
+        .progress-container {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            margin: 20px 0;
+            cursor: pointer;
+        }
+
+        /* 进度条 */
+        .progress-bar {
+            height: 100%;
+            background: #4CAF50;
+            border-radius: 3px;
+            width: 0%;
+            position: relative;
+            transition: width 0.1s linear;
+        }
+
+        /* 进度条指示器（悬停时显示） */
+        .progress-bar::after {
+            content: "";
+            position: absolute;
+            right: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .progress-container:hover .progress-bar::after {
+            opacity: 1;
+        }
+
+        /* 控制按钮区域 */
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 15px 0;
+        }
+
+        /* 播放/暂停按钮 */
+        .play-pause {
+            width: 50px;
+            height: 50px;
+            background: #4CAF50;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .play-pause:hover {
+            transform: scale(1.05);
+            background: #45a049;
+        }
+
+        .play-icon,
+        .pause-icon {
+            font-size: 1.2rem;
+        }
+
+        .pause-icon {
+            display: none;
+        }
+
+        /* 时间显示 */
+        .time {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #ddd;
+        }
+
+        /* 音量控制区域 */
+        .volume-control {
+            display: flex;
+            align-items: center;
+        }
+
+        .volume-icon {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        /* 音量滑块 */
+        .volume-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            width: 80px;
+            outline: none;
+        }
+
+        /* 自定义滑块拇指 */
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        /* 响应式设计 - 小屏幕适配 */
+        @media (max-width: 400px) {
+            .audio-player {
+                padding: 15px;
+            }
+
+            .album-cover {
+                width: 60px;
+                height: 60px;
+            }
+
+            .song-title {
+                font-size: 1rem;
+            }
+
+            .song-artist {
+                font-size: 0.8rem;
+            }
+
+            .play-pause {
+                width: 40px;
+                height: 40px;
+            }
+
+            .volume-slider {
+                width: 60px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container d-block text-center">
+        <div>
+            <!--			<img src="/lin-test/img/海鸥.jpg" alt="" class="img-fluid h-75 w-75">-->
+            <h5 class=" pt-2 text-black">生锈的感情 又逢下雨天</h5>
+            <div class="audio-player">
+                <div class="audio-info">
+                    <div class="album-cover"></div>
+                    <div class="song-details">
+                        <div class="song-title">我想念</div>
+                        <div class="song-artist">汪苏泷</div>
+                    </div>
+                </div>
+
+                <!-- 进度条 -->
+                <div class="progress-container" id="progress-container">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+
+                <!-- 控制区域 -->
+                <div class="controls">
+                    <div class="time"> <span id="current-time">0:00</span> <span> / </span> <span
+                            id="total-time">0:00</span> </div>
+
+                    <!-- 播放/暂停按钮 -->
+                    <div class="play-pause" id="play-pause"> <img src="/lin233i.test.io/img/播放.png" alt="" class="img-fluid h-50 w-50"><i
+                            class="fa fa-play play-icon"></i> <i class="fa fa-pause pause-icon"></i> </div>
+
+                    <!-- 音量控制 -->
+                    <div class="volume-control"> <i class="fa fa-volume-up volume-icon" id="volume-icon"></i>
+                        <input type="range" min="0" max="1" step="0.05" value="0.7" class="volume-slider"
+                            id="volume-slider">
+                    </div>
+                </div>
+
+                <!-- 实际的音频元素，隐藏但控制播放 -->
+                <audio id="audio" preload="metadata">
+                    <source src="/lin233i.test.io/M800001ECLVH0EEmni.mp3" type="audio/mpeg">
+                    您的浏览器不支持音频播放。
+                </audio>
+            </div>
+            <script>
+                // 获取DOM元素引用
+                const audio = document.getElementById('audio');        // 音频元素
+                const playPauseBtn = document.getElementById('play-pause'); // 播放/暂停按钮
+                const playIcon = document.querySelector('.play-icon');     // 播放图标
+                const pauseIcon = document.querySelector('.pause-icon');   // 暂停图标
+                const progressBar = document.getElementById('progress-bar'); // 进度条
+                const progressContainer = document.getElementById('progress-container'); // 进度条容器
+                const currentTimeElement = document.getElementById('current-time'); // 当前时间显示
+                const totalTimeElement = document.getElementById('total-time');     // 总时长显示
+                const volumeSlider = document.getElementById('volume-slider');     // 音量滑块
+                const volumeIcon = document.getElementById('volume-icon');         // 音量图标
+
+                // 播放/暂停功能
+                playPauseBtn.addEventListener('click', togglePlayPause);
+
+                function togglePlayPause() {
+                    if (audio.paused || audio.ended) {
+                        // 如果音频暂停或已结束，则播放
+                        audio.play();
+                        playIcon.style.display = 'none';  // 隐藏播放图标
+                        pauseIcon.style.display = 'block'; // 显示暂停图标
+                    } else {
+                        // 如果音频正在播放，则暂停
+                        audio.pause();
+                        playIcon.style.display = 'block';  // 显示播放图标
+                        pauseIcon.style.display = 'none';  // 隐藏暂停图标
+                    }
+                }
+
+                // 音频播放时间更新时更新进度条
+                audio.addEventListener('timeupdate', updateProgress);
+
+                function updateProgress() {
+                    // 计算当前进度百分比
+                    const progress = (audio.currentTime / audio.duration) * 100;
+                    // 更新进度条宽度
+                    progressBar.style.width = `${progress}%`;
+
+                    // 更新当前时间显示
+                    currentTimeElement.textContent = formatTime(audio.currentTime);
+
+                    // 只有在元数据加载完成后才更新总时长
+                    if (audio.duration) {
+                        totalTimeElement.textContent = formatTime(audio.duration);
+                    }
+                }
+
+                // 格式化时间为 MM:SS 格式
+                function formatTime(seconds) {
+                    const minutes = Math.floor(seconds / 60);
+                    const remainingSeconds = Math.floor(seconds % 60);
+                    // 确保秒数始终显示两位数字
+                    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+                }
+
+                // 点击进度条跳转播放位置
+                progressContainer.addEventListener('click', seek);
+
+                function seek(e) {
+                    // 计算点击位置对应的时间点
+                    const containerWidth = progressContainer.clientWidth;
+                    const clickPosition = e.offsetX;
+                    const seekTime = (clickPosition / containerWidth) * audio.duration;
+                    // 更新音频播放位置
+                    audio.currentTime = seekTime;
+                }
+
+                // 音量控制
+                volumeSlider.addEventListener('input', adjustVolume);
+
+                function adjustVolume() {
+                    // 设置音频音量
+                    audio.volume = volumeSlider.value;
+
+                    // 根据音量大小更新音量图标
+                    if (audio.volume === 0) {
+                        volumeIcon.className = 'fa fa-volume-off volume-icon';
+                    } else if (audio.volume < 0.5) {
+                        volumeIcon.className = 'fa fa-volume-down volume-icon';
+                    } else {
+                        volumeIcon.className = 'fa fa-volume-up volume-icon';
+                    }
+                }
+
+                // 静音/取消静音
+                volumeIcon.addEventListener('click', toggleMute);
+
+                function toggleMute() {
+                    // 切换静音状态
+                    audio.muted = !audio.muted;
+
+                    if (audio.muted) {
+                        // 静音时更新图标和滑块
+                        volumeIcon.className = 'fa fa-volume-off volume-icon';
+                        volumeSlider.value = 0;
+                    } else {
+                        // 取消静音时更新图标和滑块
+                        volumeIcon.className = 'fa fa-volume-up volume-icon';
+                        volumeSlider.value = audio.volume;
+                    }
+                }
+
+                // 音频加载完成元数据后更新总时长
+                audio.addEventListener('loadedmetadata', updateProgress);
+
+                // 音频播放结束后重置状态
+                audio.addEventListener('ended', () => {
+                    playIcon.style.display = 'block';
+                    pauseIcon.style.display = 'none';
+                    progressBar.style.width = '0%';
+                });
+            </script>
+            <!-- /lin-test/ -->
+            <img src="/lin233i.test.io/img/南云.jpg" alt="" class="img-fluid pt-2">
+            <h5 class="border-bottom border-2 border-dark pt-3 text-black">补：雷tnt所有 补番多 一次淡圈 厨力不高 性格温良 好相处 慢热 熟了话多 <br>
+                删我 不管什么原因都单删 小窗来了就是骂 <br>
+                我有隐属 介意别来</h5>
+            <h5 class=" pt-2 text-black">山高路远 一路相伴 <br>
+                @林杞@十八@社恐@理理@祁言@白墨@奶龙@1⃣️嘻
+                <br>@鑫鑫@稚秋@落落@云枫@难过悲伤蛋@雲飛@yvkoi
+            </h5>
+        </div>
+        <div> </div>
+    </div>
+</body>
+
+</html>
